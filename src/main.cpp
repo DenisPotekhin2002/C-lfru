@@ -20,7 +20,6 @@ struct String
     {
         return data == other;
     }
-
 };
 
 using TestCache = Cache<std::string, String, AllocatorWithPool>;
