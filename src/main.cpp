@@ -28,7 +28,7 @@ using TestCache = Cache<std::string, String, AllocatorWithPool>;
 
 int main()
 {
-    TestCache cache(11, 616, std::initializer_list<std::size_t>{sizeof(String)});
+    TestCache cache(4, 280, std::initializer_list<std::size_t>{sizeof(String)});
     std::string line;
     while (std::getline(std::cin, line)) {
         auto & s = cache.get<String>(line);

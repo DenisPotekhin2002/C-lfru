@@ -21,14 +21,10 @@ public:
         m_storage.resize(obj_sizes.size());
         for (size_t i = 0; i < obj_sizes.size(); i++) {
             m_used_map[i].resize(count);
+            m_storage[i].resize(count);
             for (size_t j = 0; j < m_used_map[i].size(); j++) {
                 m_used_map[i][j] = false;
             }
-        }
-        int i = 0;
-        for (auto & element : sizes) {
-            m_storage[i].resize(count * element);
-            i++;
         }
     }
 
@@ -91,7 +87,7 @@ void * Pool::allocate(const size_t n)
         for (size_t i = pos, end = pos + n; i < end; ++i) {
             m_used_map[ind][i] = true;
         }
-        return &m_storage[ind][pos * n];
+        return &m_storage[ind][pos];
     }
     throw std::bad_alloc{};
 }
@@ -113,7 +109,7 @@ void Pool::deallocate(const void * ptr)
         ind++;
     }
     if (b_ptr >= begin && b_ptr <= end) {
-        const size_t offset = (b_ptr - begin) / len;
+        const size_t offset = b_ptr - begin;
         assert(((b_ptr - begin) % len) == 0);
         if (offset < m_used_map[ind].size()) {
             const size_t end_delete = offset + std::min(len, m_used_map[ind].size() - offset);
