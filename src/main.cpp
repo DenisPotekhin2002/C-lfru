@@ -33,12 +33,15 @@ using TestCache = Cache<std::string, String, AllocatorWithPool>;
 
 int main()
 {
-    TestCache cache(9, 18, std::initializer_list<std::size_t>{sizeof(String)});
+    TestCache cache(11, 616, std::initializer_list<std::size_t>{sizeof(String)});
     std::string line;
     while (std::getline(std::cin, line)) {
         auto & s = cache.get<String>(line);
         if (s.marked) {
             std::cout << "known" << std::endl;
+        }
+        else {
+            std::cout << "unknown" << std::endl;
         }
         s.marked = true;
     }
