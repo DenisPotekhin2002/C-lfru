@@ -15,19 +15,19 @@ public:
     Pool(const std::size_t count, std::initializer_list<std::size_t> sizes)
     {
         block_size = count;
-        for (auto &element : sizes){
+        for (auto & element : sizes) {
             obj_sizes.push_back(element);
         }
         m_used_map.resize(obj_sizes.size());
         m_storage.resize(obj_sizes.size());
-        for (size_t i = 0; i < obj_sizes.size(); i++){
+        for (size_t i = 0; i < obj_sizes.size(); i++) {
             m_used_map[i].resize(count);
-            for (size_t j = 0; j < m_used_map[i].size(); j++){
+            for (size_t j = 0; j < m_used_map[i].size(); j++) {
                 m_used_map[i][j] = false;
             }
         }
         int i = 0;
-        for (auto &element : sizes){
+        for (auto & element : sizes) {
             m_storage[i].resize(count * element);
             i++;
         }
@@ -36,7 +36,7 @@ public:
     size_t get_obj_size() const
     {
         size_t res = 0;
-        for (size_t element : obj_sizes){
+        for (size_t element : obj_sizes) {
             res += element;
         }
         return res;
@@ -82,8 +82,8 @@ size_t Pool::find_empty_place(const size_t n, int ind) const
 void * Pool::allocate(const size_t n)
 {
     int ind = 0;
-    for (auto element : obj_sizes){
-        if (element == n){
+    for (auto element : obj_sizes) {
+        if (element == n) {
             break;
         }
         ind++;
@@ -126,7 +126,6 @@ void Pool::deallocate(const void * ptr)
     }
 }
 
-
 Pool * create_pool(const std::size_t size, std::initializer_list<std::size_t> sizes)
 {
     return new Pool(size, sizes);
@@ -152,4 +151,4 @@ void deallocate(Pool & pool, const void * ptr)
     pool.deallocate(ptr);
 }
 
-} // pool namespace
+} // namespace pool

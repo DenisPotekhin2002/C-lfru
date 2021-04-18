@@ -9,32 +9,35 @@
 
 namespace pool {
 
-        class Pool;
+class Pool;
 
-        Pool * create_pool(std::size_t size, std::initializer_list<std::size_t> sizes);
+Pool * create_pool(std::size_t size, std::initializer_list<std::size_t> sizes);
 
-        void destroy_pool(Pool * pool);
+void destroy_pool(Pool * pool);
 
-        std::size_t pool_obj_size(const Pool & pool);
+std::size_t pool_obj_size(const Pool & pool);
 
-        void * allocate(Pool & pool, std::size_t n);
+void * allocate(Pool & pool, std::size_t n);
 
-        void deallocate(Pool & pool, const void * ptr);
+void deallocate(Pool & pool, const void * ptr);
 
-}
+} // namespace pool
 
 class PoolAllocator
 {
 private:
     std::reference_wrapper<pool::Pool> m_pool;
+
 public:
     PoolAllocator(const std::reference_wrapper<pool::Pool> & pool)
-            : m_pool(pool)
-    { }
+        : m_pool(pool)
+    {
+    }
 
     PoolAllocator(const PoolAllocator & other)
-            : m_pool(other.m_pool)
-    { }
+        : m_pool(other.m_pool)
+    {
+    }
 
     PoolAllocator(const std::size_t count, std::initializer_list<std::size_t> sizes)
         : m_pool(*create_pool(count, sizes))
