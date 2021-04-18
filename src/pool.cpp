@@ -14,7 +14,6 @@ class Pool
 public:
     Pool(const std::size_t count, std::initializer_list<std::size_t> sizes)
     {
-        block_size = count;
         for (auto & element : sizes) {
             obj_sizes.push_back(element);
         }
@@ -36,7 +35,7 @@ public:
     size_t get_obj_size() const
     {
         size_t res = 0;
-        for (size_t element : obj_sizes) {
+        for (const size_t element : obj_sizes) {
             res += element;
         }
         return res;
@@ -50,7 +49,6 @@ private:
     static constexpr size_t npos = static_cast<size_t>(-1);
 
     size_t find_empty_place(size_t n, int ind) const;
-    std::size_t block_size;
     std::list<size_t> obj_sizes;
     std::vector<std::vector<std::byte>> m_storage;
     std::vector<std::vector<bool>> m_used_map;
@@ -82,7 +80,7 @@ size_t Pool::find_empty_place(const size_t n, int ind) const
 void * Pool::allocate(const size_t n)
 {
     int ind = 0;
-    for (auto element : obj_sizes) {
+    for (const auto element : obj_sizes) {
         if (element == n) {
             break;
         }
@@ -105,7 +103,7 @@ void Pool::deallocate(const void * ptr)
     auto begin = &m_storage[ind][0];
     auto end = &m_storage[ind][m_storage[ind].size() - 1];
     auto len = obj_sizes.front();
-    for (auto indS : obj_sizes) {
+    for (const auto indS : obj_sizes) {
         begin = &m_storage[ind][0];
         end = &m_storage[ind][m_storage[ind].size() - 1];
         if (b_ptr >= begin && b_ptr <= end) {
