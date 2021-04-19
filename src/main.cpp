@@ -1,7 +1,10 @@
+#define _CRTDBG_MAP_ALLOC
 #include "allocator.h"
 #include "cache.h"
 
+#include <crtdbg.h>
 #include <iostream>
+#include <stdlib.h>
 #include <string>
 
 namespace {
@@ -30,7 +33,9 @@ int main()
 {
     TestCache cache(4, 280, std::initializer_list<std::size_t>{sizeof(String)});
     std::string line;
-    while (std::getline(std::cin, line)) {
+    for (int c = 0; c < 10; c++) {
+        std::getline(std::cin, line);
+        //while (std::getline(std::cin, line)) {
         auto & s = cache.get<String>(line);
         if (s.marked) {
             std::cout << "known" << std::endl;
@@ -42,4 +47,5 @@ int main()
     }
     std::cout << "\n"
               << cache << std::endl;
+    _CrtDumpMemoryLeaks();
 }

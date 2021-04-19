@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <cstddef>
 #include <new>
+#include <stdlib.h>
 #include <vector>
 
 using std::size_t;
@@ -22,9 +23,6 @@ public:
         for (size_t i = 0; i < obj_sizes.size(); i++) {
             m_used_map[i].resize(count);
             m_storage[i].resize(count);
-            for (size_t j = 0; j < m_used_map[i].size(); j++) {
-                m_used_map[i][j] = false;
-            }
         }
     }
 
