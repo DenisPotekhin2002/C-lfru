@@ -5,6 +5,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <list>
+#include <memory>
 #include <new>
 
 namespace pool {
@@ -26,21 +27,11 @@ void deallocate(Pool & pool, const void * ptr);
 class PoolAllocator
 {
 private:
-    std::reference_wrapper<pool::Pool> m_pool;
+    std::unique_ptr<pool::Pool, decltype(&pool::destroy_pool)> m_pool;
 
 public:
-    PoolAllocator(const std::reference_wrapper<pool::Pool> & pool)
-        : m_pool(pool)
-    {
-    }
-
-    PoolAllocator(const PoolAllocator & other)
-        : m_pool(other.m_pool)
-    {
-    }
-
     PoolAllocator(const std::size_t count, std::initializer_list<std::size_t> sizes)
-        : m_pool(*create_pool(count, sizes))
+        : m_pool(create_pool(count, sizes), pool::destroy_pool)
     {
     }
 
@@ -56,12 +47,12 @@ public:
 
     void * allocate(const std::size_t n)
     {
-        return pool::allocate(m_pool, n);
+        return pool::allocate(*m_pool, n);
     }
 
     template <class T>
     void deallocate(T * ptr)
     {
-        return pool::deallocate(m_pool, ptr);
+        return pool::deallocate(*m_pool, ptr);
     }
 };
