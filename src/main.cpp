@@ -1,8 +1,6 @@
-#define _CRTDBG_MAP_ALLOC
 #include "allocator.h"
 #include "cache.h"
 
-#include <crtdbg.h>
 #include <iostream>
 #include <stdlib.h>
 #include <string>
@@ -47,5 +45,4 @@ int main()
     }
     std::cout << "\n"
               << cache << std::endl;
-    _CrtDumpMemoryLeaks();
 }
