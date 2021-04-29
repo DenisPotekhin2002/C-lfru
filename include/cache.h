@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
-#include <list>
+#include <deque>
 #include <new>
 #include <ostream>
 
@@ -43,8 +43,8 @@ private:
     const std::size_t m_max_top_size; //priv
     const std::size_t m_max_low_size; //not_priv
     Allocator m_alloc;
-    std::list<KeyProvider *> priv_queue;
-    std::list<KeyProvider *> not_priv_queue;
+    std::deque<KeyProvider *> priv_queue;
+    std::deque<KeyProvider *> not_priv_queue;
 };
 
 template <class Key, class KeyProvider, class Allocator>
