@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <memory>
 #include <new>
-#include <stdlib.h>
+#include <set>
 #include <vector>
 
 using std::size_t;
@@ -17,7 +17,7 @@ public:
     Pool(const std::size_t count, std::initializer_list<std::size_t> sizes)
     {
         for (auto & element : sizes) {
-            obj_sizes.push_back(element);
+            obj_sizes.insert(element);
         }
         m_used_map.resize(obj_sizes.size());
         m_storage.resize(obj_sizes.size());
@@ -38,13 +38,17 @@ public:
 
     void * allocate(size_t n);
 
+    std::pair<size_t, size_t> getInd(const void * b_ptr);
+
+    void remove(const std::byte * b_ptr, size_t ind, size_t len);
+
     void deallocate(const void * ptr);
 
 private:
     static constexpr size_t npos = static_cast<size_t>(-1);
 
     size_t find_empty_place(size_t n, int ind) const;
-    std::list<size_t> obj_sizes;
+    std::set<size_t> obj_sizes;
     std::vector<std::vector<std::byte>> m_storage;
     std::vector<std::vector<bool>> m_used_map;
 };
@@ -59,10 +63,11 @@ size_t Pool::find_empty_place(const size_t n, int ind) const
             continue;
         }
         size_t j = i;
-        for (size_t k = 0; k < n && j < m_used_map[ind].size(); ++k, ++j) {
+        while (j < std::min(m_used_map[ind].size(), i + n)) {
             if (m_used_map[ind][j]) {
                 break;
             }
+            j++;
         }
         if (n == j - i) {
             return i;
@@ -91,23 +96,26 @@ void * Pool::allocate(const size_t n)
     throw std::bad_alloc{};
 }
 
-void Pool::deallocate(const void * ptr)
+std::pair<size_t, size_t> Pool::getInd(const void * b_ptr)
 {
-    auto b_ptr = static_cast<const std::byte *>(ptr);
-    int ind = 0;
-    auto begin = &m_storage[ind][0];
-    auto end = &m_storage[ind][m_storage[ind].size() - 1];
-    auto len = obj_sizes.front();
+    size_t ind = 0;
+    auto len = *obj_sizes.begin();
     for (const auto indS : obj_sizes) {
-        begin = &m_storage[ind][0];
-        end = &m_storage[ind][m_storage[ind].size() - 1];
+        auto begin = &m_storage[ind][0];
+        auto end = &m_storage[ind][m_storage[ind].size() - 1];
         if (b_ptr >= begin && b_ptr <= end) {
             len = indS;
             break;
         }
         ind++;
     }
-    if (b_ptr >= begin && b_ptr <= end) {
+    return std::pair<size_t, size_t>(ind, len);
+}
+
+void Pool::remove(const std::byte * b_ptr, size_t ind, size_t len)
+{
+    if (ind < m_storage.size()) {
+        auto begin = &m_storage[ind][0];
         const size_t offset = b_ptr - begin;
         assert(((b_ptr - begin) % len) == 0);
         if (offset < m_used_map[ind].size()) {
@@ -117,6 +125,13 @@ void Pool::deallocate(const void * ptr)
             }
         }
     }
+}
+
+void Pool::deallocate(const void * ptr)
+{
+    auto b_ptr = static_cast<const std::byte *>(ptr);
+    std::pair<size_t, size_t> pair = getInd(b_ptr);
+    remove(b_ptr, pair.first, pair.second);
 }
 
 Pool * create_pool(const std::size_t size, std::initializer_list<std::size_t> sizes)
