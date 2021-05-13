@@ -2,6 +2,7 @@
 #include "cache.h"
 
 #include <iostream>
+#include <stdlib.h>
 #include <string>
 
 namespace {
@@ -20,11 +21,6 @@ struct String
     {
         return data == other;
     }
-
-    friend std::ostream & operator<<(std::ostream & strm, const String & str)
-    {
-        return strm << str.data;
-    }
 };
 
 using TestCache = Cache<std::string, String, AllocatorWithPool>;
@@ -33,12 +29,17 @@ using TestCache = Cache<std::string, String, AllocatorWithPool>;
 
 int main()
 {
-    TestCache cache(9, 18, std::initializer_list<std::size_t>{sizeof(String)});
+    TestCache cache(4, 280, std::initializer_list<std::size_t>{sizeof(String)});
     std::string line;
-    while (std::getline(std::cin, line)) {
+    for (int c = 0; c < 10; c++) {
+        std::getline(std::cin, line);
+        //while (std::getline(std::cin, line)) {
         auto & s = cache.get<String>(line);
         if (s.marked) {
             std::cout << "known" << std::endl;
+        }
+        else {
+            std::cout << "unknown" << std::endl;
         }
         s.marked = true;
     }
